@@ -7,7 +7,7 @@ import {
 } from '@nestjs/swagger';
 
 import { HttpResponseInterceptor } from '@common/interceptors/http-response.interceptor';
-import { INJECTION_TOKEN } from '@common/interfaces';
+import { INJECTION_TOKEN } from '@common/constants';
 
 import { AppModule } from './app.module';
 
