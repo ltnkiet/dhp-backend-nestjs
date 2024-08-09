@@ -2,8 +2,12 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 
+import { AuthModule } from '@modules/auth/auth.module';
+import { KeyTokenModule } from '@modules/key-token/key-token.module';
+import { ShopModule } from '@modules/shop/shop.module';
+
 import { AuditModule } from '@common/audit/audit.module';
-import { ENV_KEY } from '@common/interfaces';
+import { ENV_KEY } from '@common/constants';
 
 @Module({
   imports: [
@@ -18,6 +22,9 @@ import { ENV_KEY } from '@common/interfaces';
       inject: [ConfigService],
     }),
     AuditModule,
+    AuthModule,
+    ShopModule,
+    KeyTokenModule,
   ],
 })
 export class AppModule {}

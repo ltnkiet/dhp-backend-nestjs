@@ -1,3 +1,8 @@
+export interface JwtPayload {
+  shopId: any;
+  email: string;
+}
+
 export interface HasTimestamp {
   createdAt: Date;
   updatedAt: Date;
@@ -20,5 +25,3 @@ export interface PaginationResult<T = any> {
 export interface AppRequest extends Request {
   startTime: Date;
 }
-
-

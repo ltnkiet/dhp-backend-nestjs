@@ -1,15 +1,27 @@
+export enum ROLE_SHOP {
+  SHOP = 'shop',
+  WRITER = 'writer',
+  EDITOR = 'editor',
+  ADMIN = 'admin',
+}
+
 export enum HEADER_KEY {
-  CAPTCHA_TOKEN = 'X-Captcha-Token',
-  LOG_ID = 'X-Log-ID',
-  SESSION_TOKEN = 'X-Session-Token',
+  LOG_ID = 'x-log-id',
+  API_KEY = 'x-api-key',
+  CLIENT_ID = 'x-client-id',
+  AUTHORIZATION = 'authorization',
+  REFRESH_TOKEN = 'x-refresh-token',
 }
 
 export const ERR_CODE = {
   INTERNAL_SERVER_ERROR: 'INTERNAL_SERVER_ERROR'.toLowerCase(),
+  EMAIL_ALREADY_EXISTS: 'EMAIL_ALREADY_EXISTS'.toLowerCase(),
 };
 
 export const APP_ACTION = {
   HANDLE_EXCEPTION: 'HANDLE_EXCEPTION'.toLowerCase(),
+  REGISTER: 'REGISTER'.toLowerCase(),
+  LOGIN: 'LOGIN'.toLowerCase(),
 };
 
 export enum ENV_KEY {
@@ -17,10 +29,6 @@ export enum ENV_KEY {
   PORT = 'PORT',
 
   MONGO_URI = 'MONGO_URI',
-
-  AUDIT_GATEWAY_URL = 'AUDIT_GATEWAY_URL',
-  AUDIT_GATEWAY_USERNAME = 'AUDIT_GATEWAY_USERNAME',
-  AUDIT_GATEWAY_PASSWORD = 'AUDIT_GATEWAY_PASSWORD',
 
   JWT_EXPIRATION = 'JWT_EXPIRATION',
   JWT_SECRET = 'JWT_SECRET',
@@ -43,5 +51,4 @@ export enum ENV_KEY {
 export const INJECTION_TOKEN = {
   AUDIT_SERVICE: Symbol.for('AUDIT_SERVICE'),
   HTTP_SERVICE: Symbol.for('HTTP_SERVICE'),
-  REDIS_SERVICE: Symbol.for('REDIS_SERVICE'),
 };
