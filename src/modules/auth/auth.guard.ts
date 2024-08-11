@@ -1,84 +1,80 @@
-import * as JWT from 'jsonwebtoken';
+import { Request } from 'express';
 
 import {
   CanActivate,
   ExecutionContext,
   Injectable,
+  Logger,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 
 import { KeyTokenService } from '@modules/key-token/key-token.service';
+import { STATUS, ShopDocument } from '@modules/shop/shop.model';
+import { ShopService } from '@modules/shop/shop.service';
 
 import { HEADER_KEY } from '@common/constants';
-import { JwtPayload } from '@common/interfaces';
+import { toObjectId } from '@common/utils/to-object-id';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private keyTokenService: KeyTokenService) {}
+  protected logger = new Logger(AuthGuard.name);
+
+  constructor(
+    private keyTokenService: KeyTokenService,
+    private jwtService: JwtService,
+    private shopService: ShopService,
+  ) {}
+
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const token = this.extractTokenFromHeader(request);
-    const shopId = request.headers[HEADER_KEY.CLIENT_ID];
-
-    if (!token) {
-      throw new UnauthorizedException();
-    }
-
-    if (!shopId) {
-      throw new UnauthorizedException('Invalid Request');
-    }
-
-    const keyStore = await this.keyTokenService.getById(shopId);
-    if (!keyStore) {
-      throw new NotFoundException('Not found keyStore');
-    }
-
-    if (request.headers[HEADER_KEY.REFRESH_TOKEN]) {
-      try {
-        const refreshToken = request.headers[HEADER_KEY.REFRESH_TOKEN];
-
-        const decodeShop = JWT.verify(
-          refreshToken,
-          keyStore.privateKey,
-        ) as JwtPayload;
-
-        if (shopId !== decodeShop.shopId) {
-          throw new UnauthorizedException('Invalid shopId');
-        }
-
-        request.keyStore = keyStore;
-        request.shop = decodeShop;
-        request.refreshToken = refreshToken;
-
-        return true;
-      } catch (error) {
-        throw new UnauthorizedException(error.message);
-      }
-    }
-
-    const accessToken = request.headers[HEADER_KEY.AUTHORIZATION];
+    const shopID = request.headers[HEADER_KEY.CLIENT_ID];
+    const accessToken = this.extractTokenFromHeader(request);
     if (!accessToken) {
-      throw new UnauthorizedException('Invalid Token');
+      throw new UnauthorizedException('Invalid access token');
     }
 
     try {
-      const decodeShop = JWT.verify(
-        accessToken,
-        keyStore.publicKey,
-      ) as JwtPayload;
-
-      if (shopId !== decodeShop.shopId) {
-        throw new UnauthorizedException('Invalid shopId');
+      const shop: ShopDocument = await this.shopService.getById(shopID);
+      if (!shop || shop.status !== STATUS.ACTIVE) {
+        throw new UnauthorizedException('Invalid Shop');
       }
 
-      request.keyStore = keyStore;
+      const keyToken = await this.keyTokenService.getOne({
+        shopId: toObjectId(shopID),
+      });
+      if (!keyToken) {
+        throw new NotFoundException('KeyToken not found');
+      }
+
+      const decodeShop = await this.jwtService.verifyAsync(accessToken, {
+        secret: keyToken.publicKey,
+      });
+      request.keyToken = keyToken;
       request.shop = decodeShop;
 
-      return true;
+      // const refreshToken = request.headers[HEADER_KEY.REFRESH_TOKEN];
+      // if (refreshToken && refreshToken === keyToken.refreshToken) {
+      //   const decodeShop = await this.jwtService.verifyAsync(refreshToken, {
+      //     secret: keyToken.privateKey,
+      //   });
+      //
+      //   if (id !== decodeShop.id) {
+      //     throw new UnauthorizedException('Invalid ShopID');
+      //   }
+      //
+      //   request.keyToken = keyToken;
+      //   request.shop = decodeShop;
+      //   request.refreshToken = refreshToken;
+      // }
     } catch (error) {
-      throw new UnauthorizedException(error.message);
+      this.logger.error(error.message, error.stack);
+
+      throw new UnauthorizedException();
     }
+
+    return true;
   }
 
   private extractTokenFromHeader(request: Request): string | undefined {

@@ -10,7 +10,7 @@ import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 import { KeyTokenService } from '@modules/key-token/key-token.service';
-import { publicShopInfo } from '@modules/shop/shop.model';
+import { STATUS, publicShopInfo } from '@modules/shop/shop.model';
 import { ShopService } from '@modules/shop/shop.service';
 
 import { APP_ACTION, INJECTION_TOKEN, ROLE_SHOP } from '@common/constants';
@@ -20,11 +20,11 @@ import { CreateTokenPairDTO, LoginDTO, RegisterDTO } from './auth.dto';
 @Injectable()
 export class AuthService {
   protected logger = new Logger(AuthService.name);
+
   constructor(
     protected shopService: ShopService,
     protected keyTokenService: KeyTokenService,
     protected jwtService: JwtService,
-
     @Inject(INJECTION_TOKEN.AUDIT_SERVICE)
     protected auditService: AuditService,
   ) {}
@@ -60,6 +60,8 @@ export class AuthService {
         name: data.name,
         password: passwordHashed,
         role: ROLE_SHOP.SHOP,
+        status: STATUS.ACTIVE,
+        verify: true,
       });
 
       if (newShop) {
@@ -74,11 +76,7 @@ export class AuthService {
         });
 
         if (!keyStore) {
-          return {
-            success: false,
-            message: 'Create key token failed',
-            httpCode: HttpStatus.UNAUTHORIZED,
-          };
+          return keyStore;
         }
 
         const tokens = await this.createTokenPair({
@@ -156,12 +154,16 @@ export class AuthService {
         privateKey,
       });
 
-      await this.keyTokenService.createKeyToken({
+      const keyStore = await this.keyTokenService.createKeyToken({
         shopId: foundShop._id,
         publicKey,
         privateKey,
         refreshToken: tokens.refreshToken,
       });
+
+      if (!keyStore) {
+        return keyStore;
+      }
 
       return {
         success: true,

@@ -16,6 +16,7 @@ export enum HEADER_KEY {
 export const ERR_CODE = {
   INTERNAL_SERVER_ERROR: 'INTERNAL_SERVER_ERROR'.toLowerCase(),
   EMAIL_ALREADY_EXISTS: 'EMAIL_ALREADY_EXISTS'.toLowerCase(),
+  INVALID_SHOP_ID: 'INVALID_SHOP_ID',
 };
 
 export const APP_ACTION = {

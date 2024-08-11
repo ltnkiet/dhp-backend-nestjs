@@ -7,12 +7,13 @@ import { HasTimestamp } from '@common/interfaces';
 
 export type ShopDocument = HydratedDocument<Shop> & HasTimestamp;
 
-enum STATUS {
-  ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE',
+export enum STATUS {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
 }
 
 export interface ShopProfile {
+  id: string;
   name: string;
   email: string;
 }
@@ -20,8 +21,9 @@ export interface ShopProfile {
 export const publicShopInfo = (shop: ShopDocument): ShopProfile => {
   if (!shop) return null;
 
-  const { name, email } = shop;
+  const { id, name, email } = shop;
   return {
+    id,
     name,
     email,
   };

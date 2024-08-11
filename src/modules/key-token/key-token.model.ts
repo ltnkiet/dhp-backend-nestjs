@@ -4,7 +4,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 import { HasTimestamp } from '@common/interfaces';
 
-export type KeyDocument = HydratedDocument<KeyToken> & HasTimestamp;
+export type KeyTokenDocument = HydratedDocument<KeyToken> & HasTimestamp;
 
 @Schema({ collection: 'key-token', timestamps: true })
 export class KeyToken {

@@ -3,20 +3,32 @@ import { HttpResponse, stringUtils } from 'mvc-common-toolkit';
 import {
   Body,
   Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
+  Headers,
+  HttpStatus,
+  Logger,
   Post,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+
+import { KeyTokenDocument } from '@modules/key-token/key-token.model';
+import { KeyTokenService } from '@modules/key-token/key-token.service';
+
+import { ERR_CODE, HEADER_KEY } from '@common/constants';
+import { RequestKeyToken } from '@common/decorators/request-auth';
 
 import { LoginDTO, RegisterDTO } from './auth.dto';
+import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 
 @Controller('auth/shop')
 export class AuthController {
-  constructor(protected authService: AuthService) {}
+  protected logger = new Logger(AuthController.name);
+
+  constructor(
+    protected authService: AuthService,
+    protected keyTokenService: KeyTokenService,
+  ) {}
 
   @Post('register')
   @ApiOperation({ summary: 'register for shop' })
@@ -38,5 +50,30 @@ export class AuthController {
     );
 
     return loginResult;
+  }
+
+  @Post('logout')
+  @ApiOperation({ summary: 'logout for shop' })
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  public async logout(
+    @Headers(HEADER_KEY.CLIENT_ID) shopId: string,
+    @RequestKeyToken()
+    token: KeyTokenDocument,
+  ): Promise<HttpResponse> {
+    if (!shopId) {
+      return {
+        success: false,
+        code: ERR_CODE.INVALID_SHOP_ID,
+        httpCode: HttpStatus.UNAUTHORIZED,
+      };
+    }
+
+    await this.keyTokenService.deleteOne(token.id);
+
+    return {
+      success: true,
+      message: 'Logout',
+    };
   }
 }

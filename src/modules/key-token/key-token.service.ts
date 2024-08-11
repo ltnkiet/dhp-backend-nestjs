@@ -1,7 +1,7 @@
 import { Model } from 'mongoose';
 import { OperationResult } from 'mvc-common-toolkit';
 
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { BaseCRUDService } from '@common/services/base-crud.service';
@@ -12,6 +12,7 @@ import { KeyToken } from './key-token.model';
 @Injectable()
 export class KeyTokenService extends BaseCRUDService {
   protected logger = new Logger(KeyTokenService.name);
+
   constructor(@InjectModel(KeyToken.name) model: Model<KeyToken>) {
     super(model);
   }
@@ -36,6 +37,7 @@ export class KeyTokenService extends BaseCRUDService {
       return {
         success: false,
         message: 'Create key token failed',
+        httpCode: HttpStatus.UNAUTHORIZED,
       };
     }
   }

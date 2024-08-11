@@ -21,6 +21,7 @@ export class BaseCRUDService {
   public getOne(filter: any = {}, options: Partial<FindOptions> = {}) {
     const query = this.domainModel.findOne({
       ...filter,
+      deletedAt: null,
     });
 
     if (options.select) {
@@ -35,12 +36,13 @@ export class BaseCRUDService {
       query.sort(options.sort);
     }
 
-    return query.lean().exec();
+    return query.exec();
   }
 
   public count(filter: any = {}) {
     return this.domainModel.countDocuments({
       ...filter,
+      deletedAt: null,
     });
   }
 
@@ -52,11 +54,13 @@ export class BaseCRUDService {
 
     const total = await this.domainModel.countDocuments({
       ...filter,
+      deletedAt: null,
     });
 
     const findQuery = this.domainModel
       .find({
         ...filter,
+        deletedAt: null,
       })
 
       .skip(this.parseSkip(offset))
@@ -91,6 +95,7 @@ export class BaseCRUDService {
   public async getAll(filter?: any, options: Partial<FindOptions> = {}) {
     const findQuery = this.domainModel.find({
       ...filter,
+      deletedAt: null,
     });
 
     if (options.sort) {
@@ -135,6 +140,7 @@ export class BaseCRUDService {
   ) {
     const findQuery = this.domainModel.findOne({
       _id,
+      deletedAt: null,
     });
 
     if (options.populate) {
@@ -195,7 +201,13 @@ export class BaseCRUDService {
   }
 
   public deleteById(id: string) {
-    return this.domainModel.findByIdAndUpdate(id);
+    return this.domainModel.findByIdAndUpdate(id, {
+      deletedAt: new Date(),
+    });
+  }
+
+  public deleteOne(id: string) {
+    return this.domainModel.deleteOne({ _id: id });
   }
 
   public forceDeleteById(id: string) {
