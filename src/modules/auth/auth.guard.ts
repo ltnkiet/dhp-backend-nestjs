@@ -54,20 +54,22 @@ export class AuthGuard implements CanActivate {
       request.keyToken = keyToken;
       request.shop = decodeShop;
 
-      // const refreshToken = request.headers[HEADER_KEY.REFRESH_TOKEN];
-      // if (refreshToken && refreshToken === keyToken.refreshToken) {
-      //   const decodeShop = await this.jwtService.verifyAsync(refreshToken, {
-      //     secret: keyToken.privateKey,
-      //   });
-      //
-      //   if (id !== decodeShop.id) {
-      //     throw new UnauthorizedException('Invalid ShopID');
-      //   }
-      //
-      //   request.keyToken = keyToken;
-      //   request.shop = decodeShop;
-      //   request.refreshToken = refreshToken;
-      // }
+      const refreshToken = request.headers[HEADER_KEY.REFRESH_TOKEN];
+      if (refreshToken && refreshToken === keyToken.refreshToken) {
+        const decodeShop = await this.jwtService.verifyAsync(refreshToken, {
+          secret: keyToken.privateKey,
+        });
+
+        this.logger.debug(decodeShop);
+
+        if (shopID !== decodeShop.shopId) {
+          throw new UnauthorizedException('Invalid ShopID');
+        }
+
+        request.keyToken = keyToken;
+        request.shop = decodeShop;
+        request.refreshToken = refreshToken;
+      }
     } catch (error) {
       this.logger.error(error.message, error.stack);
 

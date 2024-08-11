@@ -12,14 +12,6 @@ export const getLogId = (request: AppRequest) => {
   return request.headers[HEADER_KEY.LOG_ID];
 };
 
-export const getShopId = createParamDecorator(
-  (_: any, ctx: ExecutionContext): string => {
-    const request = ctx.switchToHttp().getRequest();
-    const shopId = request.headers[HEADER_KEY.CLIENT_ID]; // Assuming shop-id is set in headers
-    return shopId;
-  },
-);
-
 export const LogId = createParamDecorator(
   (_: any, ctx: ExecutionContext): string => {
     const request = ctx.switchToHttp().getRequest();

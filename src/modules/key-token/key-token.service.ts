@@ -13,7 +13,10 @@ import { KeyToken } from './key-token.model';
 export class KeyTokenService extends BaseCRUDService {
   protected logger = new Logger(KeyTokenService.name);
 
-  constructor(@InjectModel(KeyToken.name) model: Model<KeyToken>) {
+  constructor(
+    @InjectModel(KeyToken.name)
+    model: Model<KeyToken>,
+  ) {
     super(model);
   }
 

@@ -7,6 +7,7 @@ export const RequestKeyToken = createParamDecorator(
     if (!isOptional && !keyToken) {
       throw new Error('KeyToken is missing');
     }
+
     return keyToken;
   },
 );
@@ -18,6 +19,7 @@ export const RequestShop = createParamDecorator(
     if (!isOptional && (!shop || shop.deletedAt)) {
       throw new Error('Invalid shop');
     }
+
     return shop;
   },
 );
@@ -29,6 +31,7 @@ export const RequestRefreshToken = createParamDecorator(
     if (!isOptional && !refreshToken) {
       throw new Error('RefreshToken is missing');
     }
+
     return refreshToken;
   },
 );

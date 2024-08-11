@@ -6,6 +6,7 @@ export interface JwtPayload {
 export interface HasTimestamp {
   createdAt: Date;
   updatedAt: Date;
+  deletedAt: Date;
 }
 
 export interface FindOptions {

@@ -7,7 +7,6 @@ export enum ROLE_SHOP {
 
 export enum HEADER_KEY {
   LOG_ID = 'x-log-id',
-  API_KEY = 'x-api-key',
   CLIENT_ID = 'x-client-id',
   AUTHORIZATION = 'authorization',
   REFRESH_TOKEN = 'x-refresh-token',
@@ -23,6 +22,7 @@ export const APP_ACTION = {
   HANDLE_EXCEPTION: 'HANDLE_EXCEPTION'.toLowerCase(),
   REGISTER: 'REGISTER'.toLowerCase(),
   LOGIN: 'LOGIN'.toLowerCase(),
+  REFRESH_TOKEN: 'REFRESH_TOKEN'.toLowerCase(),
 };
 
 export enum ENV_KEY {

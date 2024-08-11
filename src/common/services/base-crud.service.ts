@@ -200,14 +200,18 @@ export class BaseCRUDService {
     });
   }
 
-  public deleteById(id: string) {
+  public deleteAt(id: string) {
     return this.domainModel.findByIdAndUpdate(id, {
       deletedAt: new Date(),
     });
   }
 
-  public deleteOne(id: string) {
+  public deleteById(id: string) {
     return this.domainModel.deleteOne({ _id: id });
+  }
+
+  public deleteOne(filter: any) {
+    return this.domainModel.deleteOne({ ...filter });
   }
 
   public forceDeleteById(id: string) {

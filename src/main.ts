@@ -6,7 +6,7 @@ import {
   SwaggerModule,
 } from '@nestjs/swagger';
 
-import { HEADER_KEY, INJECTION_TOKEN } from '@common/constants';
+import { INJECTION_TOKEN } from '@common/constants';
 import { HttpLoggingInterceptor } from '@common/interceptors/http-logging.interceptor';
 import { HttpResponseInterceptor } from '@common/interceptors/http-response.interceptor';
 
@@ -47,7 +47,6 @@ async function bootstrap() {
       .setDescription('All backend APIs for the product.')
       .setVersion('2.0')
       .addBearerAuth({ type: 'http', in: 'header' })
-      .addApiKey({ type: 'apiKey', in: 'header', name: HEADER_KEY.CLIENT_ID })
       .build();
     const document = SwaggerModule.createDocument(app, config);
     const customOptions: SwaggerCustomOptions = {

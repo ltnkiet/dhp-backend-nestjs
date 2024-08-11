@@ -13,9 +13,19 @@ import { KeyTokenService } from '@modules/key-token/key-token.service';
 import { STATUS, publicShopInfo } from '@modules/shop/shop.model';
 import { ShopService } from '@modules/shop/shop.service';
 
-import { APP_ACTION, INJECTION_TOKEN, ROLE_SHOP } from '@common/constants';
+import {
+  APP_ACTION,
+  ERR_CODE,
+  INJECTION_TOKEN,
+  ROLE_SHOP,
+} from '@common/constants';
 
-import { CreateTokenPairDTO, LoginDTO, RegisterDTO } from './auth.dto';
+import {
+  CreateTokenPairDTO,
+  LoginDTO,
+  RefreshTokenDTO,
+  RegisterDTO,
+} from './auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -29,7 +39,7 @@ export class AuthService {
     protected auditService: AuditService,
   ) {}
 
-  protected async createTokenPair(data: CreateTokenPairDTO) {
+  public async createTokenPair(data: CreateTokenPairDTO) {
     const accessToken = await this.jwtService.signAsync(data.payload, {
       secret: data.publicKey,
       expiresIn: '3d',
@@ -187,6 +197,83 @@ export class AuthService {
       return {
         success: false,
         message: 'Login failed',
+        httpCode: HttpStatus.UNAUTHORIZED,
+      };
+    }
+  }
+
+  public async handleRefreshToken(
+    logId: string,
+    data: RefreshTokenDTO,
+  ): Promise<OperationResult> {
+    try {
+      const { id: shopId, email } = data.shop;
+      const { id, publicKey, privateKey, refreshToken, refreshTokenUsed } =
+        data.keyToken;
+
+      if (refreshTokenUsed.includes(refreshToken)) {
+        await this.keyTokenService.deleteOne({ shopId });
+      }
+
+      if (refreshToken !== data.refreshToken) {
+        return {
+          success: false,
+          code: ERR_CODE.INVALID_SHOP_ID,
+          httpCode: HttpStatus.UNAUTHORIZED,
+        };
+      }
+
+      const foundShop = await this.shopService.getOne({ shopId });
+      if (!foundShop) {
+        return {
+          success: false,
+          code: ERR_CODE.INVALID_SHOP_ID,
+          httpCode: HttpStatus.UNAUTHORIZED,
+        };
+      }
+
+      const tokens = await this.createTokenPair({
+        payload: {
+          shopId,
+          email,
+        },
+        publicKey,
+        privateKey,
+      });
+
+      await this.keyTokenService.updateOne(
+        { _id: id },
+        {
+          $set: {
+            refreshToken: tokens.refreshToken,
+          },
+          $addToSet: {
+            refreshTokenUsed: data.refreshToken,
+          },
+        },
+      );
+
+      return {
+        success: true,
+        data: {
+          refreshToken,
+          refreshTokenUsed,
+        },
+      };
+    } catch (error) {
+      this.logger.error(error.message, error.stack);
+
+      this.auditService.emitLog(
+        new ErrorLog({
+          logId: logId,
+          message: error.message,
+          payload: data,
+          action: APP_ACTION.REFRESH_TOKEN,
+        }),
+      );
+
+      return {
+        success: false,
         httpCode: HttpStatus.UNAUTHORIZED,
       };
     }

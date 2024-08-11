@@ -9,19 +9,21 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { KeyTokenDocument } from '@modules/key-token/key-token.model';
 import { KeyTokenService } from '@modules/key-token/key-token.service';
+import { ShopDocument } from '@modules/shop/shop.model';
 
 import { ERR_CODE, HEADER_KEY } from '@common/constants';
-import { RequestKeyToken } from '@common/decorators/request-auth';
+import { RequestKeyToken, RequestShop } from '@common/decorators/request-auth';
 
 import { LoginDTO, RegisterDTO } from './auth.dto';
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 
 @Controller('auth/shop')
+@ApiTags('shop/authentication')
 export class AuthController {
   protected logger = new Logger(AuthController.name);
 
@@ -58,8 +60,7 @@ export class AuthController {
   @ApiBearerAuth()
   public async logout(
     @Headers(HEADER_KEY.CLIENT_ID) shopId: string,
-    @RequestKeyToken()
-    token: KeyTokenDocument,
+    @RequestKeyToken() token: KeyTokenDocument,
   ): Promise<HttpResponse> {
     if (!shopId) {
       return {
@@ -69,11 +70,41 @@ export class AuthController {
       };
     }
 
-    await this.keyTokenService.deleteOne(token.id);
+    await this.keyTokenService.deleteById(token.id);
 
     return {
       success: true,
       message: 'Logout',
+    };
+  }
+
+  @Post('handleRefreshToken')
+  @ApiOperation({ summary: 'handle refresh token' })
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  public async handleRefreshToken(
+    @Headers(HEADER_KEY.CLIENT_ID) shopId: string,
+    @Headers(HEADER_KEY.REFRESH_TOKEN) refreshToken: string,
+    @RequestKeyToken() token: KeyTokenDocument,
+    @RequestShop() shop: ShopDocument,
+  ): Promise<HttpResponse> {
+    if (!shopId) {
+      return {
+        success: false,
+        code: ERR_CODE.INVALID_SHOP_ID,
+        httpCode: HttpStatus.UNAUTHORIZED,
+      };
+    }
+
+    await this.authService.handleRefreshToken(stringUtils.generateRandomId(), {
+      refreshToken,
+      shop,
+      keyToken: token,
+    });
+
+    return {
+      success: true,
+      httpCode: HttpStatus.OK,
     };
   }
 }

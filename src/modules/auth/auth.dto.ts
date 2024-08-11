@@ -1,12 +1,9 @@
-import {
-  IsEmail,
-  IsEnum,
-  IsOptional,
-  MaxLength,
-  MinLength,
-} from 'class-validator';
+import { IsEmail, IsEnum, MaxLength, MinLength } from 'class-validator';
 
 import { ApiProperty } from '@nestjs/swagger';
+
+import { KeyTokenDocument } from '@modules/key-token/key-token.model';
+import { ShopDocument } from '@modules/shop/shop.model';
 
 import { ROLE_SHOP } from '@common/constants';
 
@@ -59,4 +56,10 @@ export class LoginDTO {
   @MinLength(8)
   @MaxLength(60)
   password: string;
+}
+
+export class RefreshTokenDTO {
+  refreshToken: string;
+  shop: ShopDocument;
+  keyToken: KeyTokenDocument;
 }
