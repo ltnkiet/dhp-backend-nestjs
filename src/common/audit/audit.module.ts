@@ -9,7 +9,7 @@ import {
 import { Global, Module, Provider } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { ENV_KEY, INJECTION_TOKEN } from '@common/interfaces';
+import { ENV_KEY, INJECTION_TOKEN } from '@common/constants';
 
 const auditServiceProvider: Provider = {
   provide: INJECTION_TOKEN.AUDIT_SERVICE,
@@ -24,7 +24,7 @@ const auditServiceProvider: Provider = {
 
     const gateway = shouldUseWebhook
       ? new WebhookAuditGateway(webhookUrl, httpService, {
-          projectName: '== digital-hippo-backend ==',
+          projectName: 'digital-hippo-backend',
         })
       : new StdOutAuditGateway();
 
