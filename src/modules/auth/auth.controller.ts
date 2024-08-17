@@ -23,7 +23,7 @@ import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 
 @Controller('auth/shop')
-@ApiTags('shop/authentication')
+@ApiTags('Shop/Authentication')
 export class AuthController {
   protected logger = new Logger(AuthController.name);
 
