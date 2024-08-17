@@ -15,7 +15,7 @@ import { STATUS, ShopDocument } from '@modules/shop/shop.model';
 import { ShopService } from '@modules/shop/shop.service';
 
 import { HEADER_KEY } from '@common/constants';
-import { toObjectId } from '@common/utils/to-object-id';
+import { toObjectId } from '@common/utils/format';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
