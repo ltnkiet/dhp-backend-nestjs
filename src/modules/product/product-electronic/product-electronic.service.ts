@@ -4,27 +4,29 @@ import { OperationResult } from 'mvc-common-toolkit';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
-import { Product, ProductDocument } from '@modules/product/product.model';
 import { ProductService } from '@modules/product/product.service';
+
+import { BaseCRUDService } from '@common/services/base-crud.service';
 
 import { Electronic } from './product-electronic.model';
 
 @Injectable()
-export class ElectronicsService extends ProductService {
+export class ElectronicsService extends BaseCRUDService {
   constructor(
-    @InjectModel(Product.name) productModel: Model<ProductDocument>,
-    @InjectModel(Electronic.name) private electronicModel: Model<Electronic>,
-  ) {
-    super(productModel, {});
-  }
+    @InjectModel(Electronic.name)
+    model: Model<Electronic>,
 
-  public async createProduct(): Promise<OperationResult> {
-    const newElectronic = await this.electronicModel.create({
-      ...this.productDto.product_attributes,
-      product_shop: this.productDto.product_shop,
+    protected productService: ProductService,
+  ) {
+    super(model);
+  }
+  public async createElectronicAttributes(): Promise<OperationResult> {
+    const newElectronicAttributes = await this.create({
+      ...this.productService.productDto.product_attributes,
+      product_shop: this.productService.productDto.product_shop,
     });
 
-    if (!newElectronic) {
+    if (!newElectronicAttributes) {
       return {
         success: false,
         message: 'Create Electronic Error',
@@ -32,7 +34,9 @@ export class ElectronicsService extends ProductService {
       };
     }
 
-    const newProduct = await super.createProduct(newElectronic.id);
+    const newProduct = await this.productService.createProduct(
+      newElectronicAttributes.id,
+    );
 
     return {
       success: true,

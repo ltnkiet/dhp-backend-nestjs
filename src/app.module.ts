@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 
 import { AuthModule } from '@modules/auth/auth.module';
 import { KeyTokenModule } from '@modules/key-token/key-token.module';
+import { ProductModule } from '@modules/product/product.module';
 import { ShopModule } from '@modules/shop/shop.module';
 
 import { AuditModule } from '@common/audit/audit.module';
@@ -25,6 +26,7 @@ import { ENV_KEY } from '@common/constants';
     AuthModule,
     ShopModule,
     KeyTokenModule,
+    ProductModule,
   ],
 })
 export class AppModule {}

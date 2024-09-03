@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
+import { KeyTokenModule } from '@modules/key-token/key-token.module';
 import {
   Clothes,
   ClothesSchema,
@@ -11,6 +12,9 @@ import {
 } from '@modules/product/product-electronic/product-electronic.model';
 import { Product, ProductSchema } from '@modules/product/product.model';
 import { ProductService } from '@modules/product/product.service';
+import { ShopModule } from '@modules/shop/shop.module';
+
+import { PRODUCT_TYPE } from '@common/constants';
 
 import { ClothesService } from './product-clothes/product-clothes.service';
 import { ElectronicsService } from './product-electronic/product-electronic.service';
@@ -33,6 +37,8 @@ import { ProductController } from './product.controller';
         schema: ClothesSchema,
       },
     ]),
+    KeyTokenModule,
+    ShopModule,
   ],
   controllers: [ProductController],
   providers: [
@@ -50,7 +56,13 @@ import { ProductController } from './product.controller';
 })
 export class ProductModule {
   constructor(protected productFactory: ProductFactoryService) {
-    this.productFactory.registerProductType('Clothes', ClothesService);
-    this.productFactory.registerProductType('Electronic', ElectronicsService);
+    this.productFactory.registerProductType(
+      PRODUCT_TYPE.CLOTHES,
+      ClothesService,
+    );
+    this.productFactory.registerProductType(
+      PRODUCT_TYPE.ELECTRONIC,
+      ElectronicsService,
+    );
   }
 }

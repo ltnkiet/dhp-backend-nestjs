@@ -1,3 +1,8 @@
+export enum PRODUCT_TYPE {
+  ELECTRONIC = 'electronic',
+  CLOTHES = 'clothes',
+}
+
 export enum ROLE_SHOP {
   SHOP = 'shop',
   WRITER = 'writer',

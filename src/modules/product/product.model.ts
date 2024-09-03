@@ -3,6 +3,7 @@ import slugify from 'slugify';
 
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
+import { PRODUCT_TYPE } from '@common/constants';
 import { HasTimestamp } from '@common/interfaces';
 
 export type ProductDocument = HydratedDocument<Product> & HasTimestamp;
@@ -30,8 +31,8 @@ export class Product {
   @Prop({ required: true })
   product_price: number;
 
-  @Prop({ required: true })
-  product_type: string;
+  @Prop({ required: true, enum: PRODUCT_TYPE })
+  product_type: PRODUCT_TYPE;
 
   @Prop({ type: Types.ObjectId, ref: 'shops' })
   product_shop: string;

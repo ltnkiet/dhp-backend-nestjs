@@ -1,0 +1,13 @@
+{
+  "product_name": "SONY XPERIA XA",
+  "product_thumb": "https://cdn.shopify.com/s/files/1/1903/4853/products/xperia-xa-white-D1-hero-image-35f68ba1669ba23b989e7519e4a1660d_1024x1024.jpg?v=1491404881",
+  "product_description": "New Product",
+  "product_quantity": 1000,
+  "product_price": 12000000,
+  "product_type": "Electronics",
+  "product_attributes": {
+    "manufactuner": "Sony",
+    "model": "XA",
+    "color": "White"
+  }
+}

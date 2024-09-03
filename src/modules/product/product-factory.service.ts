@@ -4,27 +4,31 @@ import { OperationResult } from 'mvc-common-toolkit';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
-import { Clothes } from '@modules/product/product-clothes/product-clothes.model';
-import { Electronic } from '@modules/product/product-electronic/product-electronic.model';
-import { Product, ProductDocument } from '@modules/product/product.model';
+import { PRODUCT_TYPE } from '@common/constants';
+
+import {
+  Clothes,
+  ClothesDocument,
+} from './product-clothes/product-clothes.model';
+import {
+  Electronic,
+  ElectronicDocument,
+} from './product-electronic/product-electronic.model';
+import { Product, ProductDocument } from './product.model';
 
 @Injectable()
 export class ProductFactoryService {
   protected productRegistry = {};
 
-  constructor(
-    @InjectModel(Product.name) protected productModel: Model<ProductDocument>,
-    @InjectModel(Clothes.name) protected clothesModel: Model<Clothes>,
-    @InjectModel(Electronic.name) protected electronicModel: Model<Electronic>,
-  ) {}
+  constructor() {}
 
-  public registerProductType(type: string, classRef: any): void {
+  public registerProductType(type: PRODUCT_TYPE, classRef: any): void {
     this.productRegistry[type] = classRef;
   }
 
   public async createProduct(
-    type: string,
-    data: any,
+    type: PRODUCT_TYPE,
+    data: Partial<ProductDocument>,
   ): Promise<OperationResult> {
     const productClass = this.productRegistry[type];
     if (!productClass) {
@@ -35,12 +39,7 @@ export class ProductFactoryService {
       };
     }
 
-    const instance = new productClass(
-      this.productModel,
-      this.clothesModel,
-      this.electronicModel,
-      data,
-    );
+    const instance = new productClass(data);
 
     const productInstance = await instance.createProduct();
 

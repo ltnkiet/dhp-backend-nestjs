@@ -39,7 +39,10 @@ export class AuthService {
     protected auditService: AuditService,
   ) {}
 
-  public async createTokenPair(data: CreateTokenPairDTO) {
+  public async createTokenPair(data: CreateTokenPairDTO): Promise<{
+    accessToken: string;
+    refreshToken: string;
+  }> {
     const accessToken = await this.jwtService.signAsync(data.payload, {
       secret: data.publicKey,
       expiresIn: '3d',
